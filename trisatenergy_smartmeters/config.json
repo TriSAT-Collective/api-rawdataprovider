@@ -1,0 +1,34 @@
+{
+  "AppSettings": {
+    "RabbitMQ": {
+      "Uri": "amqp://localhost",
+      "VirtualHost": "/vcs",
+      "Username": "guest",
+      "Password": "guest",
+      "ExchangeName": "smartmeter-exchange",
+      "RoutingKeyBase": "smartmeter"
+    },
+    "Misc": {
+      "MaintenanceMode": false,
+      "ContinuousSimulation": true,
+      "ContinuousSimulationIntervalMs": 3000,
+      "OnceOffSimulationHours": 24
+    },
+    "EnergySources": {
+      "EnabledSources": [
+        "Solar",
+        "Wind",
+        "Other"
+      ],
+      "SolarEnergyProduction": 5.0,
+      "WindEnergyProduction": 7.5,
+      "OtherEnergyProduction": 2.5,
+      "ResultDecimalPlaces": 4
+    },
+    "Logging": {
+      "LogLevel": {
+        "Default": "Information"
+      }
+    }
+  }
+}

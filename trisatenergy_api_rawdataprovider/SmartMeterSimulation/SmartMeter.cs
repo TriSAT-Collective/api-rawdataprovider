@@ -3,9 +3,9 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using trisatenergy_smartmeters.SmartMeterSimulation.EnergySources;
+using trisatenergy_api_rawdataprovider.SmartMeterSimulation.EnergySources;
 
-namespace trisatenergy_smartmeters.SmartMeterSimulation;
+namespace trisatenergy_api_rawdataprovider.SmartMeterSimulation;
 
 /// <summary>
 ///     The SmartMeter class simulates household energy consumption and production from various sources.

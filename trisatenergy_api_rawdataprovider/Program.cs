@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using trisatenergy_smartmeters.SmartMeterSimulation;
+using trisatenergy_api_rawdataprovider.SmartMeterSimulation;
 
-namespace trisatenergy_smartmeters;
+namespace trisatenergy_api_rawdataprovider;
 
 /// <summary>
 ///     Entry point of the application that runs the smart meter simulation.

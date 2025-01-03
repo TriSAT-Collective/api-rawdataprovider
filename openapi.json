@@ -1,0 +1,421 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Energiegemeinschaft API",
+    "description": "API Spezifikation des Verteilte Systeme & Cloud-Technologien Labors.\n\n**BENUTZUNG:**\n1. Mittels '/sim/apikey' einen API Key holen und diesen fortan bei jedwedem API-Zugriff verwenden.\n2. Mittels '/sim/metering-points' die in der Simulation vorhandenen MeteringPoints holen.\n3. Ueber '/metering-point' bzw. '/weather' Daten abfragen.\n\nDie einzelnen Endpunkte haben eigene Beschreibungen.\n\n<sub>(Aufgrund von Einschraenkungen der automatischen Codegenerierung wurde OAS 3.0 anstelle von OAS 3.1 gewaehlt).</sub>",
+    "contact": {
+      "name": "Gruppe: Mayr, Scheicher, Sebela, Wollmarker",
+      "email": "admin@beste-energiegemeinschaft.ever"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://127.0.0.1",
+      "description": "Lokaler API Server"
+    },
+    {
+      "url": "https://beste-energiegemeinschaft.ever",
+      "description": "Produktion API Server"
+    }
+  ],
+  "paths": {
+    "/sim/apikey": {
+      "get": {
+        "summary": "Simulations-interne Abfrage eines API Keys für Zugriff",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["ait", "bin"]
+            },
+            "description": "Der user des angeforderten API keys. Entweder 'ait' oder 'bin'."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API Key retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "api_key": {
+                      "type": "string",
+                      "example": "generated-api-key-123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Diesen user gibt es nicht"
+          }
+        },
+        "security": []
+      }
+    },
+    "/sim/metering-points": {
+      "get": {
+        "summary": "Simulations-interne Abfrage der verfügbaren MeteringPoints",
+        "operationId": "getMeteringPoints",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SimMeteringPoint"
+                  },
+                  "type": "array",
+                  "title": "Alle verfuegbaren MeteringPoints inklusive Positions-ID\n"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailableError"
+          }
+        }
+      }
+    },
+    "/metering-point": {
+      "post": {
+        "description": "Abfrage der Daten eines Tages oder eines Zeitraums.\n- *id* MUSS immer angegeben sein\n- *date* wird angegeben bei Abfrage eines einzelnen Tages. Dann duerfen *date_begin* und *date_end* NICHT angegeben sein.\n- *date_begin* und *date_end* werden bei einer Abfrage eines ganzen Zeitraumes angegeben. Dann darf *date* NICHT angegeben werden.",
+        "summary": "Abfrage der Daten eines MeteringPoints",
+        "operationId": "get_meteringpoint_data",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ApiRequest"
+        },
+        "responses": {
+          "200": {
+            "description": "Erfolgreicher API Call",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MeteringData"
+                  },
+                  "type": "array",
+                  "title": "MeteringPoint Daten"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },          
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailableError"
+          }
+        }
+      }
+    },
+    "/weather": {
+      "post": {
+        "summary": "Wetterdaten eines Standorts",
+        "description": "Verwendung siehe '/metering-point'",
+        "operationId": "getWeatherData",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ApiRequest"
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherData"
+                  },
+                  "type": "array",
+                  "title": "Wetter Daten"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },          
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailableError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "requestBodies": {
+      "ApiRequest": {
+        "description": "API Abfrage-Parameter.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Eindeutige ID (UUIDv4)."
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Das Datum der Abfrage."
+                },
+                "date_begin": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Das Anfangsdatum (inklusive) der Abfrage. Kann NICHT zusammen mit 'date' benutzt werden. MUSS zusammen mit 'date_end' benutzt werden."
+                },
+                "date_end": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Das Enddatum (inklusive) der Abfrage. Kann NICHT zusammen mit 'date' benutzt werden. MUSS zusammen mit 'date_begin' benutzt werden."
+                }
+              },
+              "required": ["id"],
+              "oneOf": [
+                {
+                  "required": ["id", "date"]
+                },
+                {
+                  "required": ["id", "date_begin", "date_end"]
+                }
+              ]
+            },
+            "examples": {
+              "ExampleWithDate": {
+                "summary": "Beispielabfrage eines Tages",
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "date": "2024-01-01"
+                }
+              },
+              "ExampleWithDateRange": {
+                "summary": "Beispielabfrage eines Zeitraumes",
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "date_begin": "2025-01-01",
+                  "date_end": "2025-01-10"
+                }
+              }              
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SimMeteringPoint": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "MeteringPoint ID",
+            "description": "ID des MeteringPoints. Als UUIDv4 implementiert."
+          },
+          "location": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Position ID",
+            "description": "ID der Position des MeteringPoints. Als UUIDv4 implementiert."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "location"
+        ],
+        "title": "Simulierter MeteringPoint"
+      },
+      "MeteringData": {
+        "properties": {
+          "reading": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "title": "Zaehlerstand in kWh"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Zeitstempel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reading",
+          "timestamp"
+        ],
+        "title": "MeteringPoint Daten"
+      },
+      "WeatherData": {
+        "type": "object",
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "format": "float",
+            "minimum": -100.0,
+            "maximum": 100.0,
+            "description": "Temperatur in Grad Celsius."
+          },
+          "clouds": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Wolkendichte in Prozent"
+          },
+          "wind": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0.0,
+            "description": "Windgeschwindigkeit in Meter pro Sekunde."
+          },
+          "sunrise": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Sonnenaufgang im ISO 8601 Format."
+          },
+          "sunset": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Sonnenuntergang im ISO 8601 Format."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Daten-Zeitstempel im ISO 8601 Format."
+          }
+        },
+        "title": "Wetterdaten",
+        "description": "Diese Daten sind angelehnt an die von [openweathermap](https://openweathermap.org) bereitgestellten."
+      }
+    },
+    "responses": {
+      "BadRequestError": {
+        "description": "Falscher Zugriff",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Falsche/Ungueltige Parameter angegeben."
+                }
+              }
+            }
+          }
+        }
+      },      
+      "UnauthorizedError": {
+        "description": "Unauthorisierter Zugriff",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Unauthorisierter Zugriff. API Key fehlt oder ist falsch."
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Die angegebene Ressource konnte nicht gefunden werden."
+                }
+              }
+            }
+          }
+        }
+      },      
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Unerwarteter Server-Fehler."
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServiceUnavailableError": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Der Datenzugriff ist momentan nicht moeglich. Bitte versuchen Sie es spaeter erneut."
+                }
+              }
+            }
+          }
+        }
+      }      
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "name": "X-API-KEY",
+        "in": "header",
+        "description": "Der API Key als 'X-API-KEY' Eintrag im HTTP Header. Aufgrund der Einschraenkungen der Code-Generierung wurde die Sicherheitsmethode API-Key anstelle von oauth2 gewaehlt."
+      }
+    }    
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]  
+}

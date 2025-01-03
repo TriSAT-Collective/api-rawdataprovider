@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using trisatenergy_smartmeters.SmartMeterSimulation.EnergySources;
+using trisatenergy_api_rawdataprovider.SmartMeterSimulation.EnergySources;
 
-namespace trisatenergy_smartmeters;
+namespace trisatenergy_api_rawdataprovider;
 
 public class AppSettings
 {

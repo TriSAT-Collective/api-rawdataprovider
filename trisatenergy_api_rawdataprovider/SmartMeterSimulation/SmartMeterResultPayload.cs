@@ -1,6 +1,6 @@
-using trisatenergy_smartmeters.SmartMeterSimulation.EnergySources;
+using trisatenergy_api_rawdataprovider.SmartMeterSimulation.EnergySources;
 
-namespace trisatenergy_smartmeters.SmartMeterSimulation;
+namespace trisatenergy_api_rawdataprovider.SmartMeterSimulation;
 
 public class SmartMeterResultPayload
 {

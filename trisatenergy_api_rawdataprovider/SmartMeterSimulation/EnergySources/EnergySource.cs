@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace trisatenergy_smartmeters.SmartMeterSimulation.EnergySources;
+namespace trisatenergy_api_rawdataprovider.SmartMeterSimulation.EnergySources;
 
 /// <summary>
 ///     Abstract base class for different energy sources.
